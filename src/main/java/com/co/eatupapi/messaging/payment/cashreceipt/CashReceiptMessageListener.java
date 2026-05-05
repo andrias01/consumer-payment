@@ -4,6 +4,7 @@ import com.co.eatupapi.services.payment.cashreceipt.CashReceiptCommandHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,15 +18,21 @@ public class CashReceiptMessageListener {
         this.commandHandler = commandHandler;
     }
 
+    //@Headers Map<String, Object> headers
+    //headers.forEach((k, v) -> System.out.println(k + ": " + v));
+    //A todo el mensaje System.out.println(message.getMessageProperties().getHeaders());
     @RabbitListener(queues = "${rabbitmq.queue.payment.cashreceipt.create}")
-    public void onCreate(CashReceiptCreateMessage message) {
+    public void onCreate(CashReceiptCreateMessage message,
+                         @Header("hola") String hola) {
         try {
             commandHandler.handleCreate(message);
+            System.out.println("Header hola: " + hola);
             log.info(
-                    "Processed cashreceipt create message: locationId={}, invoiceId={}, paymentMethodId={}",
+                    "Processed cashreceipt create message: locationId={}, invoiceId={}, paymentMethodId={}, Mensaje del head con hola:{}",
                     message != null ? message.getLocationId() : null,
                     message != null ? message.getInvoiceId() : null,
-                    message != null ? message.getPaymentMethodId() : null
+                    message != null ? message.getPaymentMethodId() : null,
+                    hola
             );
         } catch (IllegalArgumentException ex) {
             log.warn(
