@@ -35,9 +35,3 @@ out/
 
 ### VS Code ###
 .vscode/
-
-### Environment variables ###
-.env
-.DS_Store
-**/.DS_Store
-.idea/
