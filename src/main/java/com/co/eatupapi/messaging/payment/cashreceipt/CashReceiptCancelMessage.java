@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -15,5 +16,6 @@ import java.util.UUID;
 public class CashReceiptCancelMessage {
     private UUID locationId;
     private UUID receiptId;
+    private BigDecimal invoiceTotal;
     private LocalDateTime eventDate;
 }

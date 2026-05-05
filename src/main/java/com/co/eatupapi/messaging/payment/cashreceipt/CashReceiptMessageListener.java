@@ -4,7 +4,6 @@ import com.co.eatupapi.services.payment.cashreceipt.CashReceiptCommandHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,21 +17,15 @@ public class CashReceiptMessageListener {
         this.commandHandler = commandHandler;
     }
 
-    //@Headers Map<String, Object> headers
-    //headers.forEach((k, v) -> System.out.println(k + ": " + v));
-    //A todo el mensaje System.out.println(message.getMessageProperties().getHeaders());
     @RabbitListener(queues = "${rabbitmq.queue.payment.cashreceipt.create}")
-    public void onCreate(CashReceiptCreateMessage message,
-                         @Header("hola") String hola) {
+    public void onCreate(CashReceiptCreateMessage message) {
         try {
             commandHandler.handleCreate(message);
-            System.out.println("Header hola: " + hola);
             log.info(
-                    "Processed cashreceipt create message: locationId={}, invoiceId={}, paymentMethodId={}, Mensaje del head con hola:{}",
+                    "Processed cashreceipt create message: locationId={}, invoiceId={}, paymentMethodId={}",
                     message != null ? message.getLocationId() : null,
                     message != null ? message.getInvoiceId() : null,
-                    message != null ? message.getPaymentMethodId() : null,
-                    hola
+                    message != null ? message.getPaymentMethodId() : null
             );
         } catch (IllegalArgumentException ex) {
             log.warn(
@@ -40,12 +33,24 @@ public class CashReceiptMessageListener {
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.create][VALIDATION_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         } catch (Exception ex) {
             log.error(
                     "Failed processing cashreceipt create message. Error={} | payload={}",
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.create][UNEXPECTED_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         }
     }
 
@@ -64,12 +69,24 @@ public class CashReceiptMessageListener {
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.cancel][VALIDATION_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         } catch (Exception ex) {
             log.error(
                     "Failed processing cashreceipt cancel message. Error={} | payload={}",
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.cancel][UNEXPECTED_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         }
     }
 }

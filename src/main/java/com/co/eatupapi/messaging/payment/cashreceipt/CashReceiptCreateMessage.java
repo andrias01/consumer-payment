@@ -16,7 +16,11 @@ import java.util.UUID;
 public class CashReceiptCreateMessage {
     private UUID locationId;
     private UUID invoiceId;
+    private UUID invoiceLocationId;
+    private String invoiceStatus;
+    private BigDecimal invoiceTotal;
     private BigDecimal amount;
     private UUID paymentMethodId;
+    private Boolean paymentMethodActive;
     private LocalDateTime eventDate;
 }
