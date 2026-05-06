@@ -33,12 +33,24 @@ public class CashReceiptMessageListener {
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.create][VALIDATION_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         } catch (Exception ex) {
             log.error(
                     "Failed processing cashreceipt create message. Error={} | payload={}",
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.create][UNEXPECTED_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         }
     }
 
@@ -57,12 +69,24 @@ public class CashReceiptMessageListener {
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.cancel][VALIDATION_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         } catch (Exception ex) {
             log.error(
                     "Failed processing cashreceipt cancel message. Error={} | payload={}",
                     ex.getMessage(),
                     message
             );
+            System.err.printf(
+                    "[consumer_payment][cashreceipt.cancel][UNEXPECTED_ERROR] %s | payload=%s%n",
+                    ex.getMessage(),
+                    message
+            );
+            ex.printStackTrace();
         }
     }
 }
