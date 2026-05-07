@@ -213,6 +213,60 @@ public class InvoiceCommandHandler {
 
         log.info("Invoice marked as {}: id={}, cashReceiptId={}",
                 invoice.getStatus(), invoice.getId(), message.getCashReceiptId());
+
+        // Regla: toda transición real a PAID debe ejecutar los side effects
+        if (invoice.getStatus() == InvoiceStatus.PAID) {
+            handleInvoicePaidSideEffects(invoice.getId(), invoice.getLocationId());
+        }
+    }
+
+    // ──────────────────────────────────────────────
+    // PAID SIDE EFFECTS
+    // ──────────────────────────────────────────────
+
+    /**
+     * Ejecuta los side effects obligatorios cuando una factura transita a PAID.
+     *
+     * <p>Este método debe invocarse por cualquier componente (CashReceiptCommandHandler,
+     * handleMarkPaid, etc.) que deje una factura en estado PAID, para garantizar que
+     * operaciones dependientes (cierre de mesa, notificaciones, etc.) siempre ocurran.
+     *
+     * @param invoiceId  identificador de la factura que acaba de quedar en PAID
+     * @param locationId sede de la factura
+     */
+    @Transactional
+    public void handleInvoicePaidSideEffects(UUID invoiceId, UUID locationId) {
+        if (invoiceId == null || locationId == null) {
+            log.warn("handleInvoicePaidSideEffects called with null params: invoiceId={}, locationId={}",
+                    invoiceId, locationId);
+            return;
+        }
+
+        Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
+        if (invoice == null) {
+            log.warn("handleInvoicePaidSideEffects: invoice not found: {}", invoiceId);
+            return;
+        }
+
+        if (invoice.getStatus() != InvoiceStatus.PAID) {
+            log.warn("handleInvoicePaidSideEffects called but invoice is not PAID: id={}, status={}",
+                    invoiceId, invoice.getStatus());
+            return;
+        }
+
+        // ── Side effects al pago completo ──────────────────────────────────────
+        // 1. Cierre de mesa (tableId presente en la factura)
+        if (invoice.getTableId() != null) {
+            log.info("[PAID_SIDE_EFFECT] Closing table: tableId={}, invoiceId={}, locationId={}",
+                    invoice.getTableId(), invoiceId, locationId);
+            // TODO: publicar evento de cierre de mesa cuando exista el publisher
+        }
+
+        // 2. Notificación / auditoría del pago completo
+        log.info("[PAID_SIDE_EFFECT] Invoice fully paid: invoiceId={}, locationId={}, totalPrice={}",
+                invoiceId, locationId, invoice.getTotalPrice());
+
+        // 3. Espacio para futuros side effects (fidelización, reportes, etc.)
     }
 
     // ──────────────────────────────────────────────
