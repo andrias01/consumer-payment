@@ -79,4 +79,25 @@ public class InvoiceMessageListener {
             throw ex;
         }
     }
+
+    @RabbitListener(queues = "${rabbitmq.queue.payment.invoice.status-update}")
+    public void handleStatusUpdate(InvoiceStatusUpdateMessage message) {
+        try {
+            commandHandler.handleStatusUpdate(message);
+            log.info("Processed invoice status-update message: invoiceId={}, locationId={}, status={}",
+                    message != null ? message.getInvoiceId() : null,
+                    message != null ? message.getLocationId() : null,
+                    message != null ? message.getStatus() : null);
+        } catch (InvoiceMessageValidationException ex) {
+            log.warn("Rejected invoice status-update message due to validation error: {} | payload={}",
+                    ex.getMessage(), message);
+        } catch (InvoiceProcessingException ex) {
+            log.warn("Rejected invoice status-update message due to business error: {} | payload={}",
+                    ex.getMessage(), message);
+        } catch (Exception ex) {
+            log.error("Failed processing invoice status-update message. Error={} | payload={}",
+                    ex.getMessage(), message);
+            throw ex;
+        }
+    }
 }

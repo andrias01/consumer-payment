@@ -26,6 +26,7 @@ public class InvoiceCreateMessage {
     private BigDecimal discountPercentage;
     private String discountDescription;
     private String tableId;
+    private String tableSessionId;
     private String locationName;
     private BigDecimal subtotal;
     private BigDecimal discountAmount;

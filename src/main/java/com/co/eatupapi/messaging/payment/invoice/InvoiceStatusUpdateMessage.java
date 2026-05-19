@@ -1,11 +1,11 @@
 package com.co.eatupapi.messaging.payment.invoice;
 
+import com.co.eatupapi.domain.payment.invoice.InvoiceStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,13 +13,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @ToString
-public class InvoiceMarkPaidMessage {
+public class InvoiceStatusUpdateMessage {
     private UUID locationId;
     private UUID invoiceId;
-    private UUID cashReceiptId;
-    private BigDecimal paidAmount;
-    private UUID paymentMethodId;
-    private String tableId;
-    private String tableSessionId;
+    private InvoiceStatus status;
+    private String reason;
     private LocalDateTime eventDate;
 }
